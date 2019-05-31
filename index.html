@@ -376,7 +376,7 @@
                 
               
 
-              <time title="创建时间：2019-05-31 10:11:14 / 修改时间：10:33:05" itemprop="dateCreated datePublished" datetime="2019-05-31T10:11:14+08:00">2019-05-31</time>
+              <time title="创建时间：2019-05-31 10:11:14 / 修改时间：11:29:18" itemprop="dateCreated datePublished" datetime="2019-05-31T10:11:14+08:00">2019-05-31</time>
             
 
             
@@ -524,7 +524,7 @@
 <p>自变量X的内容：</p>
 <p><img src="\images\2.png" alt></p>
 <p>因变量y的内容：</p>
-<p><img src="E:\MyHexoBlog\source\images\2.png" alt></p>
+<p><img src="E:\MyHexoBlog\source\images\3.png" alt></p>
 </li>
 </ol>
 <ol start="3">
@@ -539,17 +539,17 @@
 <p>机器学习算法中使用的都是方程，处理的都是数字，而我们的自变量X中存在Country和Purchased两个类别，于是需要把这些类别转化成有意义的数字，以便于后面方程的处理。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Encoding categorical data</span></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> LabelEncoder, OneHotEncoder</span><br><span class="line"><span class="comment"># 将不同的分类标签转化成数字</span></span><br><span class="line">labelencoder_X = LabelEncoder()       </span><br><span class="line">X[:, <span class="number">0</span>] = labelencoder_X.fit_transform(X[:, <span class="number">0</span>])</span><br></pre></td></tr></table></figure>
 <p>将标签转化成数字之后自变量X的内容如下：</p>
-<p><img src="E:\MyHexoBlog\source\_posts\机器学习（1）数据预处理\4.png" alt></p>
+<p><img src="\images\4.png" alt></p>
 <p>这里出现了一个新的问题，因为我们的country标签只有不同类别之分，而没有数值大小之分，所以直接转化成数字是不合适的，还需要将数字转化成<strong>虚拟编码</strong>(Dummy Code):</p>
-<p><img src="E:\MyHexoBlog\source\_posts\机器学习（1）数据预处理\4_1.png" alt></p>
+<p><img src="\images\4_1.png" alt></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 将不同的分类标签转化成数字之后，本无数值差别的分类标签有了数值上的差别</span></span><br><span class="line"><span class="comment"># 为了解决这个问题，使用虚拟编码，用虚拟变量表示不同的类</span></span><br><span class="line">onehotencoder = OneHotEncoder(categorical_features = [<span class="number">0</span>])   </span><br><span class="line">X = onehotencoder.fit_transform(X).toarray()</span><br></pre></td></tr></table></figure>
 <p>这时自变量X的内容如下：</p>
-<p><img src="E:\MyHexoBlog\source\_posts\机器学习（1）数据预处理\5.png" alt></p>
+<p><img src="\images\5.png" alt></p>
 <p>可以看到，Country标签已经完全由虚拟编码表示出来了。</p>
 <p>最后处理因变量y：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 最后一列 y 为因变量， python可以自动将因变量识别为分类数据，所以不需要使用OneHotEncoder这个类</span></span><br><span class="line"><span class="comment"># 只需要将分类结果转化为数字</span></span><br><span class="line">labelencoder_y = LabelEncoder()         </span><br><span class="line">y = labelencoder_y.fit_transform(y)</span><br></pre></td></tr></table></figure>
 <p>此时y：</p>
-<p><img src="E:\MyHexoBlog\source\_posts\机器学习（1）数据预处理\6.png" alt></p>
+<p><img src="\images\6.png" alt></p>
 </li>
 </ol>
 <ol start="5">
@@ -561,7 +561,7 @@
 <ol start="6">
 <li><p><strong>特征缩放</strong></p>
 <p>自变量的数量级不一样，会导致其比重失衡，所以需要将所有自变量放在同一个数量级下，就用到了特征缩放。</p>
-<p>方法：<img src="E:\MyHexoBlog\source\_posts\机器学习（1）数据预处理\7.png" alt></p>
+<p>方法：<img src="\images\7.png" alt></p>
 <p>标准化方法：</p>
 <p>x:自变量，年龄或者薪水</p>
 <p>mean(x):自变量均值</p>
@@ -571,15 +571,15 @@
 <p>max(x):自变量x中最大值</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Feature Scaling</span></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler</span><br><span class="line">sc_X = StandardScaler()</span><br><span class="line">X_train = sc_X.fit_transform(X_train)  </span><br><span class="line">X_test = sc_X.transform(X_test)   <span class="comment"># sc_X已经经过拟合了，所以这里直接转化就行</span></span><br></pre></td></tr></table></figure>
 <p>进行完特征缩放之后，X_train：</p>
-<p><img src="E:\MyHexoBlog\source\_posts\机器学习（1）数据预处理\8.png" alt></p>
+<p><img src="\images\8.png" alt></p>
 <p>X_test：</p>
-<p><img src="E:\MyHexoBlog\source\_posts\机器学习（1）数据预处理\9.png" alt></p>
+<p><img src="\images\9.png" alt></p>
 </li>
 </ol>
 <p>   y_train：</p>
-<p>   <img src="E:\MyHexoBlog\source\_posts\机器学习（1）数据预处理\10.png" alt></p>
+<p>   <img src="\images\10.png" alt></p>
 <p>   y_test：</p>
-<p>   <img src="E:\MyHexoBlog\source\_posts\机器学习（1）数据预处理\11.png" alt></p>
+<p>   <img src="\images\11.png" alt></p>
 <p>   到这里，数据预处理已经基本完成。</p>
 <p>数据预处理部分全部代码：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Data Processing Template</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Importing the Libraries</span></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt </span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"><span class="comment"># Import the dataset </span></span><br><span class="line">dataset = pd.read_csv(<span class="string">'Data.csv'</span>)</span><br><span class="line">X = dataset.iloc[:, :<span class="number">-1</span>].values</span><br><span class="line">y = dataset.iloc[:, <span class="number">3</span>].values</span><br><span class="line"></span><br><span class="line"><span class="comment"># Taking care of missing data</span></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> Imputer</span><br><span class="line">imputer = Imputer(missing_values = <span class="string">'NaN'</span>, strategy = <span class="string">'mean'</span>, axis = <span class="number">0</span>)</span><br><span class="line">imputer = imputer.fit(X[:, <span class="number">1</span>:<span class="number">3</span>])</span><br><span class="line">X[:, <span class="number">1</span>:<span class="number">3</span>] = imputer.transform(X[:, <span class="number">1</span>:<span class="number">3</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># Encoding categorical data</span></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> LabelEncoder, OneHotEncoder</span><br><span class="line"><span class="comment"># 将不同的分类标签转化成数字</span></span><br><span class="line">labelencoder_X = LabelEncoder()       </span><br><span class="line">X[:, <span class="number">0</span>] = labelencoder_X.fit_transform(X[:, <span class="number">0</span>]) </span><br><span class="line"></span><br><span class="line"><span class="comment"># 将不同的分类标签转化成数字之后，本无数值差别的分类标签有了数值上的差别</span></span><br><span class="line"><span class="comment"># 为了解决这个问题，使用虚拟编码，用虚拟变量表示不同的类</span></span><br><span class="line">onehotencoder = OneHotEncoder(categorical_features = [<span class="number">0</span>])   </span><br><span class="line">X = onehotencoder.fit_transform(X).toarray()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 最后一列 y 为因变量， python可以自动将因变量识别为分类数据，所以不需要使用OneHotEncoder这个类</span></span><br><span class="line"><span class="comment"># 只需要将分类结果转化为数字</span></span><br><span class="line">labelencoder_y = LabelEncoder()         </span><br><span class="line">y = labelencoder_y.fit_transform(y)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Splitting the dataset into the Training set and Test set</span></span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = <span class="number">0.2</span>, random_state = <span class="number">0</span>) </span><br><span class="line"><span class="comment"># 希望每次的训练集和测试集相同，random_state = 0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Feature Scaling</span></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler</span><br><span class="line">sc_X = StandardScaler()</span><br><span class="line">X_train = sc_X.fit_transform(X_train)  </span><br><span class="line">X_test = sc_X.transform(X_test)   <span class="comment"># sc_X已经经过拟合了，所以这里直接转化就行</span></span><br></pre></td></tr></table></figure>
