@@ -116,7 +116,7 @@
 <meta property="og:image" content="http://yoursite.com/images/9.png">
 <meta property="og:image" content="http://yoursite.com/images/10.png">
 <meta property="og:image" content="http://yoursite.com/images/11.png">
-<meta property="og:updated_time" content="2019-05-31T03:30:57.694Z">
+<meta property="og:updated_time" content="2019-05-31T03:47:01.463Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="机器学习（1）数据预处理">
 <meta name="twitter:description" content="Part 1 . Data Preprocessing最近开始了解机器学习，在这里对自己学过的知识做一个总结。 数据预处理操作顺序：    Get the  Dataset 下载数据集     Importing the Libraries 导入标准库   Importing the Dataset 导入数据集   Taking Care of Missing Data 处理缺失数据   Cate">
@@ -388,7 +388,7 @@
                 
               
 
-              <time title="创建时间：2019-05-31 10:11:14 / 修改时间：11:30:57" itemprop="dateCreated datePublished" datetime="2019-05-31T10:11:14+08:00">2019-05-31</time>
+              <time title="创建时间：2019-05-31 10:11:14 / 修改时间：11:47:01" itemprop="dateCreated datePublished" datetime="2019-05-31T10:11:14+08:00">2019-05-31</time>
             
 
             
@@ -517,16 +517,18 @@
 <li>每个机器学习的模型里都有自变量和因变量，自变量是用来预测的工具，因变量是预测的结果，通过自变量去预测因变量。</li>
 <li>在每一次创建机器学习的模型之前，都要对数据进行预处理。</li>
 </ul>
+<hr>
 <ol>
-<li><p><strong>导入标准库</strong></p>
+<li><strong>导入标准库</strong></li>
+</ol>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Importing the Libraries</span></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt </span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br></pre></td></tr></table></figure>
 <p>Numpy: NumPy(Numerical Python) 是 Python 语言个扩展程序库，支持大量的维度数组与矩阵运算，此外也针对数组运算提供大量的数学函数库。</p>
 <p>Matplotlib: Matplotlib是一个Python 2D绘图库，可以生成各种硬拷贝格式和跨平台交互式环境的出版物质量数据。Matplotlib可用于Python脚本，Python和IPython shell，Jupyter笔记本，Web应用程序服务器和四个图形用户界面工具包。</p>
 <p>Pandas: pandas是一个开源的，BSD许可的库，为Python编程语言提供高性能，易于使用的数据结构和数据分析工具。</p>
-</li>
-</ol>
+<hr>
 <ol start="2">
-<li><p><strong>导入数据集</strong></p>
+<li><strong>导入数据集</strong></li>
+</ol>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Import the dataset </span></span><br><span class="line">dataset = pd.read_csv(<span class="string">'Data.csv'</span>)</span><br><span class="line">X = dataset.iloc[:, :<span class="number">-1</span>].values</span><br><span class="line">y = dataset.iloc[:, <span class="number">3</span>].values</span><br></pre></td></tr></table></figure>
 <p>导入数据集时应注意应将Spyder的工作路径设置为与数据集所在文件目录。通过将.py文件另存为，然后保存在数据集所在文件夹里即可。</p>
 <p>数据集导入之后，dataset内容如下：</p>
@@ -535,17 +537,17 @@
 <p><img src="\images\2.png" alt></p>
 <p>因变量y的内容：</p>
 <p><img src="\images\3.png" alt></p>
-</li>
-</ol>
+<hr>
 <ol start="3">
-<li><p><strong>处理缺失数据</strong></p>
+<li><strong>处理缺失数据</strong></li>
+</ol>
 <p>注意到自变量X中有两个用nan表示的缺失数据。为了不影响后面的操作，需要对缺失数据进行处理。</p>
 <p>这里使用缺失数据所在列的平均值替换该缺失数据。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Taking care of missing data</span></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> Imputer</span><br><span class="line">imputer = Imputer(missing_values = <span class="string">'NaN'</span>, strategy = <span class="string">'mean'</span>, axis = <span class="number">0</span>)</span><br><span class="line">imputer = imputer.fit(X[:, <span class="number">1</span>:<span class="number">3</span>])</span><br><span class="line">X[:, <span class="number">1</span>:<span class="number">3</span>] = imputer.transform(X[:, <span class="number">1</span>:<span class="number">3</span>])</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
+<hr>
 <ol start="4">
-<li><p><strong>分类数据</strong></p>
+<li><strong>分类数据</strong></li>
+</ol>
 <p>机器学习算法中使用的都是方程，处理的都是数字，而我们的自变量X中存在Country和Purchased两个类别，于是需要把这些类别转化成有意义的数字，以便于后面方程的处理。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Encoding categorical data</span></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> LabelEncoder, OneHotEncoder</span><br><span class="line"><span class="comment"># 将不同的分类标签转化成数字</span></span><br><span class="line">labelencoder_X = LabelEncoder()       </span><br><span class="line">X[:, <span class="number">0</span>] = labelencoder_X.fit_transform(X[:, <span class="number">0</span>])</span><br></pre></td></tr></table></figure>
 <p>将标签转化成数字之后自变量X的内容如下：</p>
@@ -560,16 +562,16 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 最后一列 y 为因变量， python可以自动将因变量识别为分类数据，所以不需要使用OneHotEncoder这个类</span></span><br><span class="line"><span class="comment"># 只需要将分类结果转化为数字</span></span><br><span class="line">labelencoder_y = LabelEncoder()         </span><br><span class="line">y = labelencoder_y.fit_transform(y)</span><br></pre></td></tr></table></figure>
 <p>此时y：</p>
 <p><img src="\images\6.png" alt></p>
-</li>
-</ol>
+<hr>
 <ol start="5">
-<li><p><strong>将数据分为数据集和训练集</strong></p>
+<li><strong>将数据分为数据集和训练集</strong></li>
+</ol>
 <p>大多数数据应该被分配到训练集中，因为机器需要足够的信息去学习数据之间的关系，所以一般测试集所占比重为0.2~0.25。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Splitting the dataset into the Training set and Test set</span></span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = <span class="number">0.2</span>, random_state = <span class="number">0</span>) </span><br><span class="line"><span class="comment"># 希望每次的训练集和测试集相同，random_state = 0</span></span><br></pre></td></tr></table></figure>
-</li>
-</ol>
+<hr>
 <ol start="6">
-<li><p><strong>特征缩放</strong></p>
+<li><strong>特征缩放</strong></li>
+</ol>
 <p>自变量的数量级不一样，会导致其比重失衡，所以需要将所有自变量放在同一个数量级下，就用到了特征缩放。</p>
 <p>方法：<img src="\images\7.png" alt></p>
 <p>标准化方法：</p>
@@ -584,14 +586,13 @@
 <p><img src="\images\8.png" alt></p>
 <p>X_test：</p>
 <p><img src="\images\9.png" alt></p>
-</li>
-</ol>
-<p>   y_train：</p>
-<p>   <img src="\images\10.png" alt></p>
-<p>   y_test：</p>
-<p>   <img src="\images\11.png" alt></p>
-<p>   到这里，数据预处理已经基本完成。</p>
-<p>数据预处理部分全部代码：</p>
+<p>y_train：</p>
+<p><img src="\images\10.png" alt></p>
+<p>y_test：</p>
+<p><img src="\images\11.png" alt></p>
+<p>到这里，数据预处理已经基本完成。</p>
+<hr>
+<p><strong>数据预处理部分全部代码：</strong></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Data Processing Template</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Importing the Libraries</span></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt </span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"></span><br><span class="line"><span class="comment"># Import the dataset </span></span><br><span class="line">dataset = pd.read_csv(<span class="string">'Data.csv'</span>)</span><br><span class="line">X = dataset.iloc[:, :<span class="number">-1</span>].values</span><br><span class="line">y = dataset.iloc[:, <span class="number">3</span>].values</span><br><span class="line"></span><br><span class="line"><span class="comment"># Taking care of missing data</span></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> Imputer</span><br><span class="line">imputer = Imputer(missing_values = <span class="string">'NaN'</span>, strategy = <span class="string">'mean'</span>, axis = <span class="number">0</span>)</span><br><span class="line">imputer = imputer.fit(X[:, <span class="number">1</span>:<span class="number">3</span>])</span><br><span class="line">X[:, <span class="number">1</span>:<span class="number">3</span>] = imputer.transform(X[:, <span class="number">1</span>:<span class="number">3</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># Encoding categorical data</span></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> LabelEncoder, OneHotEncoder</span><br><span class="line"><span class="comment"># 将不同的分类标签转化成数字</span></span><br><span class="line">labelencoder_X = LabelEncoder()       </span><br><span class="line">X[:, <span class="number">0</span>] = labelencoder_X.fit_transform(X[:, <span class="number">0</span>]) </span><br><span class="line"></span><br><span class="line"><span class="comment"># 将不同的分类标签转化成数字之后，本无数值差别的分类标签有了数值上的差别</span></span><br><span class="line"><span class="comment"># 为了解决这个问题，使用虚拟编码，用虚拟变量表示不同的类</span></span><br><span class="line">onehotencoder = OneHotEncoder(categorical_features = [<span class="number">0</span>])   </span><br><span class="line">X = onehotencoder.fit_transform(X).toarray()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 最后一列 y 为因变量， python可以自动将因变量识别为分类数据，所以不需要使用OneHotEncoder这个类</span></span><br><span class="line"><span class="comment"># 只需要将分类结果转化为数字</span></span><br><span class="line">labelencoder_y = LabelEncoder()         </span><br><span class="line">y = labelencoder_y.fit_transform(y)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Splitting the dataset into the Training set and Test set</span></span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line">X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = <span class="number">0.2</span>, random_state = <span class="number">0</span>) </span><br><span class="line"><span class="comment"># 希望每次的训练集和测试集相同，random_state = 0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Feature Scaling</span></span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler</span><br><span class="line">sc_X = StandardScaler()</span><br><span class="line">X_train = sc_X.fit_transform(X_train)  </span><br><span class="line">X_test = sc_X.transform(X_test)   <span class="comment"># sc_X已经经过拟合了，所以这里直接转化就行</span></span><br></pre></td></tr></table></figure>
 
       
