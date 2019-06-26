@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在openCV3中新提供了两个用于快速连通区域分析的函数：  connectedComponents() connectedComponentsWithStats()">
+<meta name="keywords" content="技术,openCV,图像处理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用openCV3函数connectedComponentsWithStats()进行快速连通区域分析">
+<meta property="og:url" content="http://yoursite.com/2019/06/26/使用openCV3函数connectedComponentsWithStats-进行快速连通区域分析/index.html">
+<meta property="og:site_name" content="qinmuran">
+<meta property="og:description" content="在openCV3中新提供了两个用于快速连通区域分析的函数：  connectedComponents() connectedComponentsWithStats()">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/images/703.png">
+<meta property="og:image" content="http://yoursite.com/images/first.png">
+<meta property="og:image" content="http://yoursite.com/images/s_1_3.png">
+<meta property="og:image" content="http://yoursite.com/images/s_boundbox_1_3.png">
+<meta property="og:image" content="http://yoursite.com/images/second.png">
+<meta property="og:image" content="http://yoursite.com/images/labeled_map.png">
+<meta property="og:image" content="http://yoursite.com/images/find.png">
+<meta property="og:updated_time" content="2019-06-26T14:32:34.315Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用openCV3函数connectedComponentsWithStats()进行快速连通区域分析">
+<meta name="twitter:description" content="在openCV3中新提供了两个用于快速连通区域分析的函数：  connectedComponents() connectedComponentsWithStats()">
+<meta name="twitter:image" content="http://yoursite.com/images/703.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019/06/26/使用openCV3函数connectedComponentsWithStats-进行快速连通区域分析/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>使用openCV3函数connectedComponentsWithStats()进行快速连通区域分析 | qinmuran</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">qinmuran</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">3</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">2</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">4</span></a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/26/使用openCV3函数connectedComponentsWithStats-进行快速连通区域分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="任克勤">
+      <meta itemprop="description" content="大地在沉睡时，我们仍在赶路">
+      <meta itemprop="image" content="/images/myprofile.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="qinmuran">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用openCV3函数connectedComponentsWithStats()进行快速连通区域分析
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-06-26 22:19:04 / 修改时间：22:32:34" itemprop="dateCreated datePublished" datetime="2019-06-26T22:19:04+08:00">2019-06-26</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/图像处理/" itemprop="url" rel="index"><span itemprop="name">图像处理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在openCV3中新提供了两个用于快速连通区域分析的函数：</p>
+<ol>
+<li>connectedComponents()</li>
+<li>connectedComponentsWithStats()</li>
+</ol>
+<a id="more"></a>
+<h2 id="函数声明"><a href="#函数声明" class="headerlink" title="函数声明"></a>函数声明</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> cv::connectedComponents (</span><br><span class="line">cv::InputArrayn image,      <span class="comment">// input 8-bit single-channel (binary)</span></span><br><span class="line">cv::OutputArray labels,     <span class="comment">// output label map</span></span><br><span class="line"><span class="keyword">int</span> connectivity = <span class="number">8</span>,       <span class="comment">// 4- or 8-connected components</span></span><br><span class="line"><span class="keyword">int</span> ltype = CV_32S          <span class="comment">// Output label type (CV_32S or CV_16U)</span></span><br><span class="line">);</span><br><span class="line"><span class="keyword">int</span> cv::connectedComponentsWithStats (</span><br><span class="line">cv::InputArrayn image,      <span class="comment">// input 8-bit single-channel (binary)</span></span><br><span class="line">cv::OutputArray labels,     <span class="comment">// output label map</span></span><br><span class="line">cv::OutputArray stats,      <span class="comment">// Nx5 matrix (CV_32S) of statistics:</span></span><br><span class="line">                            <span class="comment">// [x0, y0, width0, height0, area0;</span></span><br><span class="line">                            <span class="comment">// ... ; x(N-1), y(N-1), width(N-1),</span></span><br><span class="line">                            <span class="comment">// height(N-1), area(N-1)]</span></span><br><span class="line">cv::OutputArray centroids,  <span class="comment">// Nx2 CV_64F matrix of centroids:</span></span><br><span class="line">                            <span class="comment">// [ cx0, cy0; ... ; cx(N-1), cy(N-1)]</span></span><br><span class="line"><span class="keyword">int</span> connectivity = <span class="number">8</span>,       <span class="comment">// 4- or 8-connected components</span></span><br><span class="line"><span class="keyword">int</span> ltype = CV_32S          <span class="comment">// Output label type (CV_32S or CV_16U)</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p><strong>image</strong>: 输入单通道二值化图</p>
+<p><strong>labels</strong>: 输出的标记图，图像中任意一个连通区域中的每个像素被赋予相同的label，image中有几个连通区域就有几个labels，注意image的背景也被认为是一个或多个连通区域。</p>
+<p><strong>stats</strong>: 一个包含了每个label的统计量的输出，包括背景label。统计量可以通过stats(labels, COLUMN)获取，其中COLUMN是cv::ConnectedComponentsTypes的一种：</p>
+<table>
+<thead>
+<tr>
+<th>COLUMN</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CC_STAT_LEFT</td>
+<td>待检测目标外接矩形左上角坐标x</td>
+</tr>
+<tr>
+<td>CC_STAT_TOP</td>
+<td>待检测目标外接矩形左上角坐标y</td>
+</tr>
+<tr>
+<td>CC_STAT_WIDTH</td>
+<td>待检测目标外接矩形宽度</td>
+</tr>
+<tr>
+<td>CC_STAT_HEIGHT</td>
+<td>待检测目标外接矩形高度</td>
+</tr>
+<tr>
+<td>CC_STAT_AREA</td>
+<td>连通区域面积（像素个数）</td>
+</tr>
+<tr>
+<td>CC_STAT_MAX</td>
+</tr>
+</tbody>
+</table>
+<p><strong>centroids</strong>: 每个label的质心，centroids(label, 0)为x，centroids(label, 1)为y</p>
+<p><strong>connectivity</strong>: 连通性定义，4邻域和8邻域可选</p>
+<p><strong>Ltype</strong>: 输出label的类型，CV_32S 和 CV_16U可选</p>
+<hr>
+<h2 id="函数解释"><a href="#函数解释" class="headerlink" title="函数解释"></a>函数解释</h2><p>函数connectedComponents()只是简单的生成一个label图，而函数connectedComponentsWithStats()会提供关于每个连通区域的外接矩形、面积、质心等重要信息，根据<em>Learning openCV3</em>的介绍，如果不需要质心信息，可以用cv::noArray()替代centroids参数，但是我在自己电脑上这样操作没有成功。</p>
+<p>根据定义的4邻域或8邻域连通性，返回值为N，代表图中连通区域的个数，labels值的范围为[0, N-1]，值为0的label代表背景标记。</p>
+<p>这两个函数都返回找到的连通区域个数，内部实现原理来自论文<a href="https://escholarship.org/uc/item/5pc9s496" target="_blank" rel="noopener">Two Strategies to Speed Up Connected Component Labeling Algorithms</a></p>
+<hr>
+<h2 id="应用举例"><a href="#应用举例" class="headerlink" title="应用举例"></a>应用举例</h2><h3 id="例子1"><a href="#例子1" class="headerlink" title="例子1"></a>例子1</h3><p>目的：源图像中有3个待检测目标，将他们分别提取出来</p>
+<p>源图像如下：</p>
+<p><img src="\images\703.png" alt="703"></p>
+<p>需要将剪刀，角度器和压舌板单个提取出来，可以使用以上两个函数中任意一个来做，这里使用函数connectedComponents()，代码如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> cv;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Mat src_img, img_bool, labels;</span><br><span class="line">	src_img = imread(<span class="string">"F:\\我的\\703.png"</span>);</span><br><span class="line">	cvtColor(src_img, src_img, CV_BGR2GRAY);   <span class="comment">// 将源图转变为单通道图像</span></span><br><span class="line">    threshold(src_img, img_bool, <span class="number">127</span>, <span class="number">255</span>, THRESH_BINARY);   <span class="comment">// 二值化</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">int</span> nccomps = connectedComponents(img_bool, labels);   <span class="comment">// 标记连通区域，nccomps源图中为连通区域个数</span></span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"Total Connected Components Detected: "</span> &lt;&lt; nccomps &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; nccomps; ++i)   <span class="comment">// label=0为背景标记，所以从1开始</span></span><br><span class="line">	&#123;</span><br><span class="line">		Mat single_cc = Mat::zeros(img_bool.size(), CV_8UC1);     <span class="comment">// single_cc 为每一个单一的连通域</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> row = <span class="number">0</span>; row &lt; single_cc.rows; ++row)     </span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">int</span> col = <span class="number">0</span>; col &lt; single_cc.cols; ++col)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="keyword">if</span> (labels.at&lt;<span class="keyword">int</span>&gt;(row, col) == i)</span><br><span class="line">				&#123;</span><br><span class="line">					single_cc.at&lt;uchar&gt;(row, col) = <span class="number">255</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="built_in">string</span> path1 = <span class="string">"..\\s_"</span> + to_string(i) + <span class="string">".png"</span>;</span><br><span class="line">		imwrite(path1, single_cc);</span><br><span class="line">		Rect s_rect = boundingRect(single_cc);</span><br><span class="line">		Mat s_boundbox = single_cc(s_rect);</span><br><span class="line">		<span class="built_in">string</span> path2 = <span class="string">"..\\s_boundbox_"</span> + to_string(i) + <span class="string">".png"</span>;</span><br><span class="line">		imwrite(path2, s_boundbox);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	waitKey(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出显示连通区域个数为4个:<img src="\images\first.png" alt="1561464677529"></p>
+<p>s_1到s_3如下：</p>
+<p><img src="\images\s_1_3.png" alt="s_1_3"></p>
+<p>s_boundbox_1到s_boundbox_3如下：</p>
+<p><img src="\images\s_boundbox_1_3.png" alt="s_boundbox_1_3"></p>
+<p>注：可见在openCV3中提供了这两个函数之后，连通区域分析变的比以前简单了很多，而实际应用中的难点通常在于<strong>如何获得连通区域界限清楚且合理的待处理图像</strong>，即src_img。</p>
+<hr>
+<h3 id="例子2"><a href="#例子2" class="headerlink" title="例子2"></a>例子2</h3><p>目的：将每个待检测目标用不同颜色显示出来</p>
+<p>考虑到源图像中可能会有噪点，这里使用函数connectedComponentsWithStats()，并去除面积小于100的连通区域（视为噪点），代码如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> cv;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Mat src_img, img_bool, labels, img_color, stats, centroids;</span><br><span class="line">	src_img = imread(<span class="string">"F:\\我的\\703.png"</span>);</span><br><span class="line">	cvtColor(src_img, src_img, CV_BGR2GRAY);</span><br><span class="line">	threshold(src_img, img_bool, <span class="number">127</span>, <span class="number">255</span>, THRESH_BINARY);</span><br><span class="line">    <span class="keyword">int</span> nccomps = connectedComponentsWithStats(img_bool, labels, stats, centroids);</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"Total Connected Components Detected: "</span> &lt;&lt; nccomps &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">vector</span>&lt;Vec3b&gt; colors(nccomps + <span class="number">1</span>);</span><br><span class="line">	colors[<span class="number">0</span>] = Vec3b(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);       <span class="comment">// 背景像素为黑色</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= nccomps; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		colors[i] = Vec3b(rand() % <span class="number">256</span>, rand() % <span class="number">256</span>, rand() % <span class="number">256</span>);   <span class="comment">// 给每个连通区域着上随机颜色</span></span><br><span class="line">		<span class="keyword">if</span> (stats.at&lt;<span class="keyword">int</span>&gt;(i - <span class="number">1</span>, CC_STAT_AREA) &lt; <span class="number">100</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			colors[i] = Vec3b(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);    <span class="comment">// 面积小于100的连通区域视为噪点，去除</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	img_color = Mat::zeros(src_img.size(), CV_8UC3);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> y = <span class="number">0</span>; y &lt; img_color.rows; y++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> x = <span class="number">0</span>; x &lt; img_color.cols; x++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">int</span> label = labels.at&lt;<span class="keyword">int</span>&gt;(y, x);</span><br><span class="line">			CV_Assert(<span class="number">0</span> &lt;= label &amp;&amp; label &lt;= nccomps);</span><br><span class="line">			img_color.at&lt;Vec3b&gt;(y, x) = colors[label];   <span class="comment">// 连通区域着色</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	imshow(<span class="string">"Labeled map"</span>, img_color);</span><br><span class="line">    </span><br><span class="line">    waitKey(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出显示连通区域个数为4个：</p>
+<p><img src="\images\second.png" alt="second"></p>
+<p>给各个连通区域着色后的图像：</p>
+<p><img src="\images\labeled_map.png" alt="labeled_map"></p>
+<hr>
+<h2 id="OpenCV2中同样功能的实现"><a href="#OpenCV2中同样功能的实现" class="headerlink" title="OpenCV2中同样功能的实现"></a>OpenCV2中同样功能的实现</h2><p>最后再来看看在openCV2中还没有提供这两个函数时，是如何实现连通区域分析这一功能的。根据<em>Learning openCV3</em>所述，需要先使用函数cv::findContours()，第4个参数使用RETR_CCOMP；然后再令函数cv::drawContours()的第四个参数color=component_label，第五个参数thickness = -1，循环调用函数cv::drawContours()。</p>
+<p>如何将参数color设置为component_label暂时存疑，不过下面的代码里没有将参数color设置为component_label，仍然可以实现相同的功能。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> cv;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Mat src_img, img_bool;</span><br><span class="line">	src_img = imread(<span class="string">"F:\\我的\\703.png"</span>);</span><br><span class="line">	cvtColor(src_img, src_img, CV_BGR2GRAY);</span><br><span class="line">	threshold(src_img, img_bool, <span class="number">127</span>, <span class="number">255</span>, THRESH_BINARY);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;Point&gt;&gt; contours;</span><br><span class="line">	<span class="built_in">vector</span>&lt;Vec4i&gt; hierarchy;</span><br><span class="line"></span><br><span class="line">	findContours(img_bool, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_NONE, Point());</span><br><span class="line"></span><br><span class="line">	Mat dst = Mat::zeros(img_bool.rows, img_bool.cols, CV_8UC3);</span><br><span class="line">	<span class="keyword">int</span> idx = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span> (; idx &gt;= <span class="number">0</span>; idx = hierarchy[idx][<span class="number">0</span>])</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="function">Scalar <span class="title">color</span><span class="params">(rand() &amp; <span class="number">255</span>, rand() &amp; <span class="number">255</span>, rand() &amp; <span class="number">255</span>)</span></span>;</span><br><span class="line">		drawContours(dst, contours, idx, color, <span class="number">-1</span>, LINE_8, hierarchy);</span><br><span class="line">	&#125;</span><br><span class="line">	imshow(<span class="string">"components"</span>, dst);</span><br><span class="line">	</span><br><span class="line">	waitKey(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>结果如下：</p>
+<p><img src="\images\find.png" alt="find"></p>
+<p>可见在openCV2中使用cv::findContours()和cv::drawContours()也可以实现相同的功能，但是运行速度相对比较慢，原因有以下三点：</p>
+<ol>
+<li>函数cv::findContours()为每个轮廓分配一个STL的vector，有时一张图像里有成百上千个轮廓；</li>
+<li>当想要填充毗邻轮廓的非凸区域时，函数cv::drawContours()包含一些运行很慢的操作；</li>
+<li>收集连通区域的一些基本信息（如面积和外接矩形）时，会涉及一些额外的甚至代价昂贵的函数调用。</li>
+</ol>
+<p>基于以上三个原因，在openCV3中提供了函数cv::connectedComponents()和cv::connectedComponentsWithStats()来进行快速连通区域分析。</p>
+<hr>
+<p>本博文资料来自：</p>
+<ol>
+<li><em>Learning openCV3</em>  P417-419</li>
+<li><a href="https://docs.opencv.org/3.3.1/d3/dc0/group__imgproc__shape.html#ga107a78bf7cd25dec05fb4dfc5c9e765f" target="_blank" rel="noopener">openCV官方文档</a></li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/技术/" rel="tag"># 技术</a>
+          
+            <a href="/tags/openCV/" rel="tag"># openCV</a>
+          
+            <a href="/tags/图像处理/" rel="tag"># 图像处理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/02/机器学习（2）线性回归/" rel="next" title="机器学习（2）线性回归">
+                <i class="fa fa-chevron-left"></i> 机器学习（2）线性回归
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/myprofile.png" alt="任克勤">
+            
+              <p class="site-author-name" itemprop="name">任克勤</p>
+              <div class="site-description motion-element" itemprop="description">大地在沉睡时，我们仍在赶路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#函数声明"><span class="nav-text">函数声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#函数解释"><span class="nav-text">函数解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用举例"><span class="nav-text">应用举例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#例子1"><span class="nav-text">例子1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#例子2"><span class="nav-text">例子2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenCV2中同样功能的实现"><span class="nav-text">OpenCV2中同样功能的实现</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">任克勤</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数"></span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长"></span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>
