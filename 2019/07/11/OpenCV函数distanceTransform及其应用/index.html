@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="OpenCV中提供了一个计算距离图的函数cv::distanceTransform()及其带label图的重载版本，对一张图做距离变换会产生一个同样大小的新图，该新图的每个像素的值是原图中该位置上像素距自己最近的零像素的距离。">
+<meta name="keywords" content="技术,openCV,图像处理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenCV函数distanceTransform及其应用">
+<meta property="og:url" content="http://yoursite.com/2019/07/11/OpenCV函数distanceTransform及其应用/index.html">
+<meta property="og:site_name" content="qinmuran">
+<meta property="og:description" content="OpenCV中提供了一个计算距离图的函数cv::distanceTransform()及其带label图的重载版本，对一张图做距离变换会产生一个同样大小的新图，该新图的每个像素的值是原图中该位置上像素距自己最近的零像素的距离。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/images/bullet/bulletHoles.png">
+<meta property="og:image" content="http://yoursite.com/images/bullet/canny01.png">
+<meta property="og:image" content="http://yoursite.com/images/bullet/thresh01.png">
+<meta property="og:image" content="http://yoursite.com/images/bullet/distanceImg0.png">
+<meta property="og:image" content="http://yoursite.com/images/bullet/dst.png">
+<meta property="og:updated_time" content="2019-07-11T14:08:21.762Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OpenCV函数distanceTransform及其应用">
+<meta name="twitter:description" content="OpenCV中提供了一个计算距离图的函数cv::distanceTransform()及其带label图的重载版本，对一张图做距离变换会产生一个同样大小的新图，该新图的每个像素的值是原图中该位置上像素距自己最近的零像素的距离。">
+<meta name="twitter:image" content="http://yoursite.com/images/bullet/bulletHoles.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019/07/11/OpenCV函数distanceTransform及其应用/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>OpenCV函数distanceTransform及其应用 | qinmuran</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">qinmuran</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签<span class="badge">3</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类<span class="badge">2</span></a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">6</span></a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/11/OpenCV函数distanceTransform及其应用/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="任克勤">
+      <meta itemprop="description" content="大地在沉睡时，我们仍在赶路">
+      <meta itemprop="image" content="/images/myprofile.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="qinmuran">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OpenCV函数distanceTransform及其应用
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-11 22:03:38 / 修改时间：22:08:21" itemprop="dateCreated datePublished" datetime="2019-07-11T22:03:38+08:00">2019-07-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/图像处理/" itemprop="url" rel="index"><span itemprop="name">图像处理</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数"></span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长"></span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>OpenCV中提供了一个计算距离图的函数cv::distanceTransform()及其带label图的重载版本，对一张图做距离变换会产生一个同样大小的新图，该新图的每个像素的值是原图中该位置上像素距自己最近的零像素的距离。</p>
+<a id="more"></a>
+<p>函数中使用两种可选度量标准去计算距离值。一种是使用3x3或5x5掩膜，掩膜矩阵中每个点定义了该点相对于掩膜中心点相关联的”距离“。使用大点的掩膜会得到更精确的距离。另一种是计算实际的距离（如欧式距离）。</p>
+<hr>
+<h2 id="无标签距离变换"><a href="#无标签距离变换" class="headerlink" title="无标签距离变换"></a>无标签距离变换</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> cv::distanceTransform(cv::InputArray src, <span class="comment">// Input image</span></span><br><span class="line">						   cv::OutputArray dst, <span class="comment">// Result image</span></span><br><span class="line">						   <span class="keyword">int</span> distanceType, <span class="comment">// Distance metric to use</span></span><br><span class="line">						   <span class="keyword">int</span> maskSize <span class="comment">// Mask to use (3, 5, or see below)</span></span><br><span class="line">						   );</span><br></pre></td></tr></table></figure>
+<p>src：输入二值图像，注意轮廓点应该为零像素。</p>
+<p>dst：输出的32位浮点图像，大小与源图像一致，类型为CV::F32。每个像素上的值为到离该像素最近的零像素的距离。<strong>这也意味着，若设置边缘为零像素，则dst中对应边缘点上的值为0，而对应非边缘点的像素的值为到离该点最近的边缘点的距离</strong>。</p>
+<p>distanceType：选用的度量标准，可选cv::DIST_C，cv::DIST_L1， cv::DIST_L2。使用cv::DIST_C时计算4临域距离，cv::DIST_L1计算8临域距离，cv::DIST_L2计算欧式距离。</p>
+<p>maskSize：使用掩膜大小，可选3，5，cv::DIST_MASK_PRECISE。当上一参数使用cv::DIST_C或cv::DIST_L1时，这一参数设置为3，即使用3x3掩膜，可以得到较好的结果；当上一参数使用cv::DIST_L2时，若这一参数设置为5，即使用5x5掩膜，可以得到较好的结果，只不过计算速度稍慢，若这一参数设置为cv::DIST_MASK_PRECISE，则计算实际的欧式距离。</p>
+<hr>
+<h2 id="带标签距离变换"><a href="#带标签距离变换" class="headerlink" title="带标签距离变换"></a>带标签距离变换</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> cv::distanceTransform(cv::InputArray src, <span class="comment">// Input image</span></span><br><span class="line">						   cv::OutputArray dst, <span class="comment">// Result image</span></span><br><span class="line">						   cv::OutputArray labels, <span class="comment">// Connected component ids</span></span><br><span class="line">						   <span class="keyword">int</span> distanceType, <span class="comment">// Distance metric to use</span></span><br><span class="line">						   <span class="keyword">int</span> maskSize, <span class="comment">// (3, 5, or see below)</span></span><br><span class="line">						   <span class="keyword">int</span> labelType = cv::DIST_LABEL_CCOMP <span class="comment">// How to label</span></span><br><span class="line">						   );</span><br></pre></td></tr></table></figure>
+<p>labels：生成标签图，大小与源图像一致，每个像素上的值为与该像素最近的连通区域的标签值。labels是一个离散的Voronoi图。</p>
+<p>labelType：贴标签的方式，可选cv::DIST_LABEL_CCOMP和cv::DIST_LABEL_PIXEL ，前者找到由零像素组成的连通区域并给每个连通区域一个标签值，后者给每个零像素一个标签值。</p>
+<p>其他参数与上一个函数意义相同。</p>
+<hr>
+<h2 id="应用实例"><a href="#应用实例" class="headerlink" title="应用实例"></a>应用实例</h2><p>现有两张靶纸，其中一张比另一张多一个弹孔，找出该弹孔。</p>
+<p><img src="\images\bullet\bulletHoles.png" alt="bulletHoles"></p>
+<p>代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> cv;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	Mat I0, I1, img_bool0, img_bool1;</span><br><span class="line">	I0 = imread(<span class="string">"..\\I2.jpg"</span>);   <span class="comment">// 旧弹孔靶纸</span></span><br><span class="line">	I1 = imread(<span class="string">"..\\I3.jpg"</span>);   <span class="comment">// 新弹孔靶纸</span></span><br><span class="line"></span><br><span class="line">	cvtColor(I0, img_bool0, CV_BGR2GRAY);</span><br><span class="line">	cvtColor(I1, img_bool1, CV_BGR2GRAY);</span><br><span class="line"></span><br><span class="line">	blur(img_bool0, img_bool0, Size(<span class="number">3</span>, <span class="number">3</span>));     <span class="comment">// 选择的内核大小需要试错，5x5和7x7内核会把弹孔当成噪声去掉，使用3x3内核正好</span></span><br><span class="line">	blur(img_bool1, img_bool1, Size(<span class="number">3</span>, <span class="number">3</span>));</span><br><span class="line"></span><br><span class="line">	Canny(img_bool0, img_bool0, <span class="number">50</span>, <span class="number">150</span>, <span class="number">3</span>);</span><br><span class="line">	Canny(img_bool1, img_bool1, <span class="number">50</span>, <span class="number">150</span>, <span class="number">3</span>);</span><br><span class="line">	imwrite(<span class="string">"..\\canny0.png"</span>, img_bool0);</span><br><span class="line">	imwrite(<span class="string">"..\\canny1.png"</span>, img_bool1);</span><br><span class="line"></span><br><span class="line">	threshold(img_bool0, img_bool0, <span class="number">127</span>, <span class="number">255</span>, THRESH_BINARY);   <span class="comment">// 靶纸边缘和旧弹孔均为白色</span></span><br><span class="line">	threshold(img_bool1, img_bool1, <span class="number">127</span>, <span class="number">255</span>, THRESH_BINARY);   <span class="comment">// 靶纸边缘和新旧弹孔均为白色</span></span><br><span class="line">	imwrite(<span class="string">"..\\thresh0.png"</span>, img_bool0);</span><br><span class="line">	imwrite(<span class="string">"..\\thresh1.png"</span>, img_bool1);</span><br><span class="line"></span><br><span class="line">	img_bool0 = <span class="number">255</span> - img_bool0;     <span class="comment">// 为计算距离图准备，将边缘和弹孔变为黑色（零像素点）</span></span><br><span class="line"></span><br><span class="line">	Mat distanceImg0, labels0;</span><br><span class="line">	distanceTransform(img_bool0, distanceImg0, labels0, DIST_L2, <span class="number">3</span>, DIST_LABEL_CCOMP);   <span class="comment">// distanceImg0:非零点到距离最近的零点的距离</span></span><br><span class="line">	imwrite(<span class="string">"..\\distanceImg0.png"</span>, distanceImg0);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">int</span> nr = distanceImg0.rows;</span><br><span class="line">	<span class="keyword">int</span> nc = distanceImg0.cols;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; nr; j++)</span><br><span class="line">	&#123;</span><br><span class="line">		uchar* pixels1 = img_bool1.ptr&lt;uchar&gt;(j); </span><br><span class="line">		<span class="keyword">float</span>* dis0 = distanceImg0.ptr&lt;<span class="keyword">float</span>&gt;(j);</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nc; i++)    </span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span> (pixels1[i] == <span class="number">255</span>)  <span class="comment">// 边缘像素，靶纸边缘或是新旧弹孔</span></span><br><span class="line">			&#123;</span><br><span class="line">				<span class="comment">// 距离小于10的像素认为是旧弹孔图中的边缘点，设置为背景像素灰度，最后在img_bool1中留下的就是新的弹孔</span></span><br><span class="line">				<span class="comment">// 10为经验值，需试错</span></span><br><span class="line">				<span class="keyword">if</span> (dis0[i] &lt; <span class="number">10</span>)     </span><br><span class="line">				&#123;</span><br><span class="line">					pixels1[i] = <span class="number">0</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;                  </span><br><span class="line">	&#125;</span><br><span class="line">	imwrite(<span class="string">"..\\dst.png"</span>, img_bool1);</span><br><span class="line"></span><br><span class="line">	waitKey(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>图canny0和canny1：</p>
+<p><img src="\images\bullet\canny01.png" alt="canny01"></p>
+<p>图thresh0和thresh1：</p>
+<p><img src="\images\bullet\thresh01.png" alt="thresh01"></p>
+<p>图distanceImg0：</p>
+<p><img src="\images\bullet\distanceImg0.png" alt="distanceImg0"></p>
+<p>最终结果，图dst：</p>
+<p><img src="\images\bullet\dst.png" alt="dst"></p>
+<hr>
+<p>参考文献：</p>
+<ul>
+<li><em>Learing OpenCV3</em> P358-360</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/技术/" rel="tag"># 技术</a>
+          
+            <a href="/tags/openCV/" rel="tag"># openCV</a>
+          
+            <a href="/tags/图像处理/" rel="tag"># 图像处理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/04/OpenCV最小外接矩形/" rel="next" title="OpenCV最小外接矩形">
+                <i class="fa fa-chevron-left"></i> OpenCV最小外接矩形
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/myprofile.png" alt="任克勤">
+            
+              <p class="site-author-name" itemprop="name">任克勤</p>
+              <div class="site-description motion-element" itemprop="description">大地在沉睡时，我们仍在赶路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#无标签距离变换"><span class="nav-text">无标签距离变换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#带标签距离变换"><span class="nav-text">带标签距离变换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用实例"><span class="nav-text">应用实例</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">任克勤</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数"></span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长"></span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+</body>
+</html>
